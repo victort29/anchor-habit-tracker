@@ -5,6 +5,7 @@ import { useHabits } from '../hooks/useHabits'
 import AnchorMark from './AnchorMark'
 import HabitCard from './HabitCard'
 import HabitForm from './HabitForm'
+import ProgressRing from './ProgressRing'
 import StreakCalendar from './StreakCalendar'
 
 const EMPTY_SET = new Set()
@@ -26,6 +27,7 @@ export default function Dashboard({ session }) {
 
   const today = toDayKey(new Date())
   const doneToday = active.filter((h) => checkins[h.id]?.has(today)).length
+  const allDone = active.length > 0 && doneToday === active.length
 
   async function handleSave(fields) {
     if (editing === 'new') await createHabit(fields)
@@ -74,13 +76,18 @@ export default function Dashboard({ session }) {
 
       <main className="container">
         <section className="summary">
-          <div>
-            <h1>Today</h1>
-            <p className="muted">
-              {active.length === 0
-                ? 'Add your first habit to get started.'
-                : `${doneToday} of ${active.length} habit${active.length === 1 ? '' : 's'} done`}
-            </p>
+          <div className="summary-today">
+            {active.length > 0 && <ProgressRing done={doneToday} total={active.length} />}
+            <div>
+              <h1>Today</h1>
+              <p className="muted">
+                {active.length === 0
+                  ? 'Add your first habit to get started.'
+                  : allDone
+                    ? `All ${active.length} habit${active.length === 1 ? '' : 's'} done. Anchored for today! ⚓`
+                    : `${doneToday} of ${active.length} habit${active.length === 1 ? '' : 's'} done`}
+              </p>
+            </div>
           </div>
           <button className="btn btn-primary" onClick={() => setEditing('new')}>
             + New habit
