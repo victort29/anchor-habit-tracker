@@ -4,7 +4,7 @@
 
 Built for **Engineering Design 2 — Build Software with AI**. Nearly all of the code was written with AI tools (Claude Code) by describing what I wanted, testing the result, and asking for improvements.
 
-- 🌐 **Live app:** _https://YOUR-SITE.netlify.app_ ← replace after deploying
+- 🌐 **Live app:** https://habit-anchor.netlify.app/
 - 🎥 **Demo video:** _https://youtu.be/YOUR-VIDEO_ ← replace after uploading (unlisted)
 
 ---
