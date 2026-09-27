@@ -154,3 +154,10 @@ input[type='range'] { accent-color: var(--accent); }
 .cal-foot { flex-wrap: wrap; font-size: 0.85rem; }
 .legend { display: inline-flex; align-items: center; gap: 3px; color: var(--muted); font-size: 0.75rem; }
 .legend .cell { margin: 0 1px; }
+
+/* Archived habits */
+.btn-sm { padding: 0.3rem 0.8rem; font-size: 0.85rem; }
+.archived { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+.archived-list { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 0.5rem; }
+.archived-list li { display: flex; align-items: center; gap: 0.75rem; background: var(--surface); border-radius: 10px; padding: 0.5rem 0.75rem; border-left: 4px solid var(--c); opacity: 0.85; }
+.archived-name { flex: 1; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
