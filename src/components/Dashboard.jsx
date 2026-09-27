@@ -5,6 +5,7 @@ import { useHabits } from '../hooks/useHabits'
 import AnchorMark from './AnchorMark'
 import HabitCard from './HabitCard'
 import HabitForm from './HabitForm'
+import ProgressRing from './ProgressRing'
 import StreakCalendar from './StreakCalendar'
 
 const EMPTY_SET = new Set()
@@ -18,14 +19,28 @@ export default function Dashboard({ session }) {
   const [editing, setEditing] = useState(null)
   // null = closed, 'all' = every habit, habit id = one habit
   const [calendarFor, setCalendarFor] = useState(null)
+  const [showArchived, setShowArchived] = useState(false)
+
+  // Archived habits keep their history but are hidden from the main list and stats.
+  const active = habits.filter((h) => !h.archived)
+  const archived = habits.filter((h) => h.archived)
 
   const today = toDayKey(new Date())
-  const doneToday = habits.filter((h) => checkins[h.id]?.has(today)).length
+  const doneToday = active.filter((h) => checkins[h.id]?.has(today)).length
+  const allDone = active.length > 0 && doneToday === active.length
 
   async function handleSave(fields) {
     if (editing === 'new') await createHabit(fields)
     else await updateHabit(editing.id, fields)
     setEditing(null)
+  }
+
+  async function setArchived(habit, value) {
+    try {
+      await updateHabit(habit.id, { archived: value })
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   async function handleDelete(habit) {
@@ -45,7 +60,7 @@ export default function Dashboard({ session }) {
           <span>Anchor</span>
         </div>
         <div className="row">
-          {habits.length > 0 && (
+          {active.length > 0 && (
             <button className="btn btn-ghost" onClick={() => setCalendarFor('all')}>
               📅 Calendar
             </button>
@@ -61,13 +76,18 @@ export default function Dashboard({ session }) {
 
       <main className="container">
         <section className="summary">
-          <div>
-            <h1>Today</h1>
-            <p className="muted">
-              {habits.length === 0
-                ? 'Add your first habit to get started.'
-                : `${doneToday} of ${habits.length} habit${habits.length === 1 ? '' : 's'} done`}
-            </p>
+          <div className="summary-today">
+            {active.length > 0 && <ProgressRing done={doneToday} total={active.length} />}
+            <div>
+              <h1>Today</h1>
+              <p className="muted">
+                {active.length === 0
+                  ? 'Add your first habit to get started.'
+                  : allDone
+                    ? `All ${active.length} habit${active.length === 1 ? '' : 's'} done. Anchored for today! ⚓`
+                    : `${doneToday} of ${active.length} habit${active.length === 1 ? '' : 's'} done`}
+              </p>
+            </div>
           </div>
           <button className="btn btn-primary" onClick={() => setEditing('new')}>
             + New habit
@@ -85,17 +105,21 @@ export default function Dashboard({ session }) {
 
         {loading ? (
           <p className="muted center">Loading your habits…</p>
-        ) : habits.length === 0 ? (
+        ) : active.length === 0 ? (
           <div className="empty">
             <AnchorMark size={48} />
-            <p>No habits yet. What's one small thing you want to do every day?</p>
+            <p>
+              {archived.length > 0
+                ? 'No active habits. Restore one below or start something new.'
+                : "No habits yet. What's one small thing you want to do every day?"}
+            </p>
             <button className="btn btn-primary" onClick={() => setEditing('new')}>
               Create a habit
             </button>
           </div>
         ) : (
           <div className="grid">
-            {habits.map((habit) => (
+            {active.map((habit) => (
               <HabitCard
                 key={habit.id}
                 habit={habit}
@@ -103,16 +127,41 @@ export default function Dashboard({ session }) {
                 onToggle={(day) => toggleCheckin(habit.id, day)}
                 onEdit={() => setEditing(habit)}
                 onCalendar={() => setCalendarFor(habit.id)}
+                onArchive={() => setArchived(habit, true)}
                 onDelete={() => handleDelete(habit)}
               />
             ))}
           </div>
         )}
+
+        {archived.length > 0 && (
+          <section className="archived">
+            <button className="link" onClick={() => setShowArchived((v) => !v)} aria-expanded={showArchived}>
+              {showArchived ? 'Hide' : 'Show'} archived ({archived.length})
+            </button>
+            {showArchived && (
+              <ul className="archived-list">
+                {archived.map((habit) => (
+                  <li key={habit.id} style={{ '--c': habit.color }}>
+                    <span className="archived-name">{habit.name}</span>
+                    <span className="muted">{checkins[habit.id]?.size ?? 0} check-ins</span>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setArchived(habit, false)}>
+                      Restore
+                    </button>
+                    <button className="icon-btn danger" onClick={() => handleDelete(habit)} aria-label={`Delete ${habit.name}`} title="Delete">
+                      🗑
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
       </main>
 
       {calendarFor && (
         <StreakCalendar
-          habits={habits}
+          habits={active}
           checkins={checkins}
           initialHabitId={calendarFor}
           onClose={() => setCalendarFor(null)}
