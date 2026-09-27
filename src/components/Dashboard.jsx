@@ -5,6 +5,7 @@ import { useHabits } from '../hooks/useHabits'
 import AnchorMark from './AnchorMark'
 import HabitCard from './HabitCard'
 import HabitForm from './HabitForm'
+import StreakCalendar from './StreakCalendar'
 
 const EMPTY_SET = new Set()
 
@@ -15,6 +16,8 @@ export default function Dashboard({ session }) {
 
   // null = closed, 'new' = creating, habit object = editing
   const [editing, setEditing] = useState(null)
+  // null = closed, 'all' = every habit, habit id = one habit
+  const [calendarFor, setCalendarFor] = useState(null)
 
   const today = toDayKey(new Date())
   const doneToday = habits.filter((h) => checkins[h.id]?.has(today)).length
@@ -42,6 +45,11 @@ export default function Dashboard({ session }) {
           <span>Anchor</span>
         </div>
         <div className="row">
+          {habits.length > 0 && (
+            <button className="btn btn-ghost" onClick={() => setCalendarFor('all')}>
+              📅 Calendar
+            </button>
+          )}
           <span className="muted email" title={user.email}>
             {user.email}
           </span>
@@ -94,12 +102,22 @@ export default function Dashboard({ session }) {
                 days={checkins[habit.id] ?? EMPTY_SET}
                 onToggle={(day) => toggleCheckin(habit.id, day)}
                 onEdit={() => setEditing(habit)}
+                onCalendar={() => setCalendarFor(habit.id)}
                 onDelete={() => handleDelete(habit)}
               />
             ))}
           </div>
         )}
       </main>
+
+      {calendarFor && (
+        <StreakCalendar
+          habits={habits}
+          checkins={checkins}
+          initialHabitId={calendarFor}
+          onClose={() => setCalendarFor(null)}
+        />
+      )}
 
       {editing && (
         <HabitForm

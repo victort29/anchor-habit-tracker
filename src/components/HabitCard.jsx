@@ -3,7 +3,7 @@ import { currentStreak, lastNDays, longestStreak, toDayKey } from '../lib/dates'
 const WEEKDAY = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' })
 const FULL_DATE = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
 
-export default function HabitCard({ habit, days, onToggle, onEdit, onDelete }) {
+export default function HabitCard({ habit, days, onToggle, onEdit, onDelete, onCalendar }) {
   const week = lastNDays(7)
   const doneThisWeek = week.filter((d) => days.has(toDayKey(d))).length
   const streak = currentStreak(days)
@@ -19,6 +19,9 @@ export default function HabitCard({ habit, days, onToggle, onEdit, onDelete }) {
           {habit.description && <p className="muted">{habit.description}</p>}
         </div>
         <div className="card-actions">
+          <button className="icon-btn" onClick={onCalendar} aria-label={`Calendar for ${habit.name}`} title="Streak calendar">
+            📅
+          </button>
           <button className="icon-btn" onClick={onEdit} aria-label={`Edit ${habit.name}`} title="Edit">
             ✎
           </button>

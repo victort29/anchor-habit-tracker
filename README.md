@@ -17,6 +17,7 @@ Built for **Engineering Design 2 — Build Software with AI**. Nearly all of the
 | **Create** a habit | Name, optional "why it matters" note, a weekly goal (1–7 days), and a color. |
 | **Read** your habits | Dashboard shows every habit with the last 7 days, today's progress, current streak and best streak. |
 | **Update** a habit | Edit any field with the ✎ button. Tap a day circle to check in (or tap again to undo). |
+| **Streak calendar** | 📅 opens a GitHub-style yearly heatmap. "All habits" shades each day by how many habits you completed; pick one habit to see just its streak. Shows current streak, longest streak, active days and total check-ins. |
 | **Delete** a habit | 🗑 button removes the habit and all its check-in history (with a confirmation). |
 | **Private data** | Row-Level Security in the database means each user can only ever see and edit their own habits. |
 
@@ -51,6 +52,7 @@ anchor/
         ├── Dashboard.jsx       # Main page: header, summary, list of habits
         ├── HabitCard.jsx       # One habit: 7-day check-in strip, streaks, progress
         ├── HabitForm.jsx       # Pop-up form for creating and editing habits
+        ├── StreakCalendar.jsx  # GitHub-style yearly streak heatmap
         └── AnchorMark.jsx      # Anchor logo icon
 ```
 
